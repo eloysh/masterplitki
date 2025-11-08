@@ -1,0 +1,41 @@
+{
+  "base": {
+    "bathroom": {
+      "tile": 1900,
+      "porcelain": 2400
+    },
+    "backsplash": {
+      "tile": 1900,
+      "porcelain": 2100
+    },
+    "floor": {
+      "tile": 2100,
+      "porcelain": 3300
+    }
+  },
+  "coefficients": {
+    "normal": 1,
+    "diagonal": 1.1,
+    "largeFormat": 1.15,
+    "mosaic": 1.3
+  },
+  "sizeMultipliers": {
+    "small": 0.95,
+    "medium": 1,
+    "large60x120": 1.08,
+    "xl120plus": 1.15
+  },
+  "extras": {
+    "demolitionPerM2": 500,
+    "prepPerM2": 450,
+    "adhesivePerM2": 250,
+    "groutPerM2": 200,
+    "waterproofingPerM2": 350,
+    "miterPerLm": 650,
+    "siliconePerLm": 120,
+    "holePerEach": 250,
+    "gklBoxPerEach": 1500,
+    "packageDiscountPct": 5,
+    "minJob": 12000
+  }
+}

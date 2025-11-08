@@ -1,0 +1,32 @@
+{
+  "base": {
+    "bathroom": {
+      "tile": 1855,
+      "porcelain": 1850
+    },
+    "backsplash": {
+      "tile": 1840,
+      "porcelain": 1840
+    },
+    "floor": {
+      "tile": 1800,
+      "porcelain": 1800
+    }
+  },
+  "extras": {
+    "demolitionPerM2": 200,
+    "waterproofingPerM2": 250,
+    "prepPerM2": 140,
+    "adhesivePerM2": 220,
+    "groutPerM2": 130,
+    "miterPerLm": 250,
+    "siliconePerLm": 90,
+    "packageDiscountPct": 5
+  },
+  "coefficients": {
+    "normal": 1,
+    "diagonal": 1.1,
+    "largeFormat": 1.15,
+    "mosaic": 1.2
+  }
+}
