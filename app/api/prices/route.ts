@@ -40,6 +40,10 @@ async function readPrices(): Promise<Prices> {
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const mode = url.searchParams.get('mode');
+// app/api/prices/route.ts (в POST)
+if (process.env.VERCEL === '1') {
+  return new NextResponse('Persistent writes are disabled on Vercel', { status: 501 });
+}
 
   if (mode === 'auth') {
     if (!isAuthed(req)) return new NextResponse('Unauthorized', { status: 401 });
