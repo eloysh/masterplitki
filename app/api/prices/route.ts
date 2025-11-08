@@ -1,13 +1,12 @@
 // app/api/prices/route.ts
 import { NextResponse } from 'next/server';
-import path from 'path';
-import { promises as fs } from 'fs';
 import { initialPrices, type Prices } from '@/lib/initialPrices';
+import { put, list } from '@vercel/blob';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic'; // на Vercel нужен динамический рут
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const FILE = path.join(DATA_DIR, 'prices.json');
+const KEY = 'prices.json';
 
 function isAuthed(req: Request) {
   const header = req.headers.get('authorization') || '';
@@ -22,47 +21,48 @@ function isAuthed(req: Request) {
   return login.trim() === ENV_LOGIN && pass.trim() === ENV_PASSWORD;
 }
 
-async function ensureDir() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-}
-
-async function readPrices(): Promise<Prices> {
+async function readFromBlob(): Promise<Prices> {
   try {
-    const buf = await fs.readFile(FILE, 'utf8');
-    return JSON.parse(buf) as Prices;
+    // Ищем объект с точным именем
+    const { blobs } = await list({ prefix: KEY });
+    const file = blobs.find(b => b.pathname === KEY);
+    if (!file) throw new Error('no blob yet');
+
+    const res = await fetch(file.url, { cache: 'no-store' });
+    return (await res.json()) as Prices;
   } catch {
+    // нет блоба? отдадим дефолтные цены
     return initialPrices;
   }
 }
 
-// ПУБЛИЧНО: возвращаем цены (без авторизации)
-// АДМИН-ПРОВЕРКА: если ?mode=auth — требуем Basic Auth
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const mode = url.searchParams.get('mode');
-// app/api/prices/route.ts (в POST)
-if (process.env.VERCEL === '1') {
-  return new NextResponse('Persistent writes are disabled on Vercel', { status: 501 });
-}
 
-  if (mode === 'auth') {
-    if (!isAuthed(req)) return new NextResponse('Unauthorized', { status: 401 });
-    const p = await readPrices();
-    return NextResponse.json(p);
+  if (mode === 'auth' && !isAuthed(req)) {
+    return new NextResponse('Unauthorized', { status: 401 });
   }
 
-  const p = await readPrices();
+  const p = await readFromBlob();
   return NextResponse.json(p);
 }
 
-// АДМИН: сохранить цены
 export async function POST(req: Request) {
-  if (!isAuthed(req)) return new NextResponse('Unauthorized', { status: 401 });
+  if (!isAuthed(req)) {
+    return new NextResponse('Unauthorized', { status: 401 });
+  }
 
   try {
     const body = (await req.json()) as Prices;
-    await ensureDir();
-    await fs.writeFile(FILE, JSON.stringify(body, null, 2), 'utf8');
+
+    // Сохраняем JSON в Blob (публично читаемый URL)
+    await put(
+      KEY,
+      JSON.stringify(body, null, 2),
+      { access: 'public', contentType: 'application/json' }
+    );
+
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error(e);
