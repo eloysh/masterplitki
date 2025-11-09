@@ -2,24 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-/* базовые стили и фон-сетка */
-@layer base {
-  :root { color-scheme: dark; }
-  html, body { height: 100%; }
+/* базовые */
+:root { color-scheme: dark; }
+html, body { height: 100%; }
+body { @apply bg-slate-950 text-white antialiased; }
 
-  body {
-    @apply bg-slate-950 text-white antialiased;
-
-    /* твоя сетка */
-    background:
-      linear-gradient(#38bdf8 1px, transparent 1px),
-      linear-gradient(90deg, #38bdf8 1px, transparent 1px);
-    background-size: 40px 40px, 40px 40px;
-    background-color: #0b1220;
-  }
+/* нежная сетка поверх фона (не мешает контенту) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(#38bdf8 1px, transparent 1px),
+    linear-gradient(90deg, #38bdf8 1px, transparent 1px);
+  background-size: 56px 56px, 56px 56px;
+  opacity: .15;
+  z-index: 0;
 }
 
-/* твои удобные классы */
+/* удобные классы */
 @layer components {
   .btn { @apply inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10 transition-colors; }
   .btn-cta { @apply border-emerald-400 text-emerald-100 bg-emerald-500/20 hover:bg-emerald-500/30; }
